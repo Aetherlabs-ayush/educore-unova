@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
+import { Link } from "react-router-dom";
 
 type Profile = {
   name: string;
@@ -423,8 +424,21 @@ const Profile = () => {
                      form.name.trim() && form.class.trim() && form.division.trim() && 
                      form.dob && form.phone.trim();
 
+  // Check if user is a teacher
+  const isTeacher = () => {
+    const teacherData = localStorage.getItem('teacher-logged-in');
+    return teacherData !== null;
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-full pt-12 animate-fade-in">
+      {isTeacher() && (
+        <Link to="/teacher-profile-create">
+          <Button className="mb-4 bg-green-600 hover:bg-green-700">
+            Create Teacher Profile
+          </Button>
+        </Link>
+      )}
       <Card className="w-full max-w-sm shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl text-blue-800 text-center">Profile</CardTitle>

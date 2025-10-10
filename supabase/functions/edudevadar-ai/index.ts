@@ -18,13 +18,13 @@ async function callGemini(chatMessages: any[], shouldGenerateImage = false) {
     role: msg.role === 'assistant' ? 'model' : 'user'
   }));
 
-  // Enhanced system message with image generation capability
+  // Enhanced system message with web search and detailed answers
   const systemMessage = {
-    parts: [{ text: 'You are Neodevadar AI, a helpful study assistant for a school app. You can generate images when asked. When generating images, describe what you are creating in detail. You provide concise, friendly answers.' }],
+    parts: [{ text: 'You are Neodevadar AI, a helpful study assistant for a school app. When asked questions, search the web for current information and provide long, detailed, comprehensive answers with examples and explanations. Always cite sources when using web search results. You are knowledgeable, thorough, and educational.' }],
     role: 'user'
   };
 
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-2:generateContent?key=${geminiApiKey}`, {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

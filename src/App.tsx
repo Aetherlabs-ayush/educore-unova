@@ -29,6 +29,9 @@ import TeacherLiveChat from "./pages/TeacherLiveChat";
 import TeacherStudentChat from "./pages/TeacherStudentChat";
 import TeacherMessages from "./pages/TeacherMessages";
 import MediaUpload from "./pages/MediaUpload";
+import TeacherProfileCreate from "./pages/TeacherProfileCreate";
+import ViewAllTeachers from "./pages/ViewAllTeachers";
+import TeacherExamScores from "./pages/TeacherExamScores";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +66,9 @@ const App = () => (
         <Route path="/teacher-profile-setup" element={<TeacherProfileSetup />} />
         <Route path="/teacher-live-chat/:teacherId" element={<TeacherLiveChat />} />
           <Route path="/media-upload" element={<MediaUpload />} />
+            <Route path="/teacher-profile-create" element={<TeacherProfileCreate />} />
+            <Route path="/view-all-teachers" element={<ViewAllTeachers />} />
+            <Route path="/teacher-exam-scores" element={<TeacherExamScores />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNav />
