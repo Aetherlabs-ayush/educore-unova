@@ -1,75 +1,80 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function callGemini(chatMessages: any[], shouldGenerateImage = false) {
-  console.log('Calling Gemini with messages:', chatMessages);
+async function callAI(chatMessages: any[], shouldGenerateImage = false) {
+  console.log('Calling AI with messages:', chatMessages);
   console.log('Should generate image:', shouldGenerateImage);
-  
-  // Convert OpenAI format to Gemini format
-  const contents = chatMessages.map(msg => ({
-    parts: [{ text: msg.content }],
-    role: msg.role === 'assistant' ? 'model' : 'user'
-  }));
 
-  // Enhanced system message with web search and detailed answers
-  const systemMessage = {
-    parts: [{ text: 'You are Neodevadar AI, a helpful study assistant for a school app. When asked questions, search the web for current information and provide long, detailed, comprehensive answers with examples and explanations. Always cite sources when using web search results. You are knowledgeable, thorough, and educational.' }],
-    role: 'user'
-  };
+  if (shouldGenerateImage) {
+    // Use Nano Banana for image generation
+    const lastMessage = chatMessages[chatMessages.length - 1]?.content || '';
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-image-preview',
+        messages: [
+          { role: 'system', content: 'You are an AI that generates educational images based on prompts.' },
+          { role: 'user', content: lastMessage }
+        ],
+        modalities: ['image', 'text']
+      }),
+    });
 
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      contents: [systemMessage, ...contents],
-      generationConfig: {
-        temperature: 0.3,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 1000,
-      }
-    }),
-  });
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('Image generation error:', errText);
+      throw new Error(`Image generation failed: ${errText}`);
+    }
 
-  if (!response.ok) {
-    const errText = await response.text();
-    console.error('Gemini error:', errText);
-    throw new Error(`Gemini request failed: ${errText}`);
-  }
-
-  const data = await response.json();
-  console.log('Gemini response:', data);
-  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
-}
-
-async function generateImage(prompt: string) {
-  console.log('Generating image for prompt:', prompt);
-  
-  try {
-    // Use Gemini's image generation capability or fallback to a simple response
-    const imagePrompt = `Generate a detailed educational image: ${prompt}`;
+    const data = await response.json();
+    console.log('Image generation response:', data);
     
-    // For now, return a placeholder response since we need actual image generation
-    return {
-      success: true,
-      imageUrl: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkdlbmVyYXRlZCBJbWFnZTogUGxhY2Vob2xkZXI8L3RleHQ+Cjwvc3ZnPg==',
-      description: `Generated image for: ${prompt}`
-    };
-  } catch (error) {
-    console.error('Image generation error:', error);
-    return {
-      success: false,
-      error: 'Failed to generate image'
-    };
+    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    const textResponse = data.choices?.[0]?.message?.content || '';
+    
+    return { text: textResponse, imageUrl };
+  } else {
+    // Use Gemini 2.5 Flash for text responses with web search
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'You are Neodevadar AI, a helpful study assistant for a school app. When asked questions, search the web for current information and provide long, detailed, comprehensive answers with examples and explanations. Always cite sources when using web search results. You are knowledgeable, thorough, and educational.' 
+          },
+          ...chatMessages
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('AI error:', errText);
+      throw new Error(`AI request failed: ${errText}`);
+    }
+
+    const data = await response.json();
+    console.log('AI response:', data);
+    
+    const text = data.choices?.[0]?.message?.content || '';
+    return { text };
   }
 }
 
@@ -83,9 +88,9 @@ serve(async (req) => {
     const { messages, prompt, generateImage: shouldGenerateImage } = await req.json();
     console.log('Received request:', { messages, prompt, shouldGenerateImage });
 
-    if (!geminiApiKey) {
-      console.error('Missing GEMINI_API_KEY');
-      return new Response(JSON.stringify({ error: 'Missing GEMINI_API_KEY' }), {
+    if (!lovableApiKey) {
+      console.error('Missing LOVABLE_API_KEY');
+      return new Response(JSON.stringify({ error: 'Missing LOVABLE_API_KEY' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -103,17 +108,20 @@ serve(async (req) => {
       lastMessage.toLowerCase().includes(keyword)
     );
 
-    let response: any = {};
+    console.log('Getting AI response...');
+    const result = await callAI(chatMessages, needsImage);
 
-    if (needsImage) {
-      console.log('Generating image...');
-      const imageResult = await generateImage(lastMessage);
-      response.image = imageResult;
+    const response: any = {
+      generatedText: result.text
+    };
+
+    if (result.imageUrl) {
+      response.image = {
+        success: true,
+        imageUrl: result.imageUrl,
+        description: 'Generated image'
+      };
     }
-
-    console.log('Getting text response...');
-    const generatedText = await callGemini(chatMessages, needsImage);
-    response.generatedText = generatedText;
 
     console.log('Sending response:', response);
     return new Response(JSON.stringify(response), {

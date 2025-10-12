@@ -13,6 +13,7 @@ import {
     LoaderIcon,
     Sparkles,
     Command,
+    Mic,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import * as React from "react"
@@ -518,6 +519,18 @@ export function AnimatedAIChat() {
 
                     <div className="p-4 border-t border-white/[0.05] flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
+                            <motion.button
+                                type="button"
+                                onClick={handleVoiceInput}
+                                whileTap={{ scale: 0.94 }}
+                                className="p-2 text-white/40 hover:text-white/90 rounded-lg transition-colors relative group"
+                            >
+                                <Mic className="w-4 h-4" />
+                                <motion.span
+                                    className="absolute inset-0 bg-white/[0.05] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                    layoutId="button-highlight"
+                                />
+                            </motion.button>
                             <motion.button
                                 type="button"
                                 onClick={handleAttachFile}
