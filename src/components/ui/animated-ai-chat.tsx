@@ -14,10 +14,14 @@ import {
     Sparkles,
     Command,
     Mic,
+    Phone,
+    PhoneOff,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import * as React from "react"
 import { supabase } from "@/integrations/supabase/client";
+import { RealtimeChat } from "@/utils/RealtimeAudio";
+import { useToast } from "@/hooks/use-toast";
 
 interface UseAutoResizeTextareaProps {
     minHeight: number;
@@ -134,14 +138,14 @@ Textarea.displayName = "Textarea"
 
 export function AnimatedAIChat() {
     const [value, setValue] = useState("");
-    const [attachments, setAttachments] = useState<string[]>([]);
+    const [attachments, setAttachments] = useState<Array<{type: string, url: string, name: string}>>([]);
     const [isTyping, setIsTyping] = useState(false);
     const [isPending, startTransition] = useTransition();
     const [activeSuggestion, setActiveSuggestion] = useState<number>(-1);
     const [showCommandPalette, setShowCommandPalette] = useState(false);
     const [recentCommand, setRecentCommand] = useState<string | null>(null);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    const [messages, setMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
+    const [messages, setMessages] = useState<Array<{role: 'user' | 'assistant', content: string, imageUrl?: string, attachments?: Array<{type: string, url: string, name: string}>}>>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { textareaRef, adjustHeight } = useAutoResizeTextarea({
         minHeight: 60,
@@ -149,6 +153,10 @@ export function AnimatedAIChat() {
     });
     const [inputFocused, setInputFocused] = useState(false);
     const commandPaletteRef = useRef<HTMLDivElement>(null);
+    const [isVoiceCallActive, setIsVoiceCallActive] = useState(false);
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const realtimeChatRef = useRef<RealtimeChat | null>(null);
+    const { toast } = useToast();
 
     const commandSuggestions: CommandSuggestion[] = [
         { 
@@ -264,26 +272,44 @@ export function AnimatedAIChat() {
     };
 
     const handleSendMessage = async () => {
-        if (!value.trim()) return;
+        if (!value.trim() && attachments.length === 0) return;
         
-        const userMessage = { role: 'user' as const, content: value.trim() };
+        const userMessage = { 
+            role: 'user' as const, 
+            content: value.trim() || 'Sent attachments',
+            attachments: attachments.length > 0 ? [...attachments] : undefined
+        };
         setMessages(prev => [...prev, userMessage]);
         setValue("");
+        setAttachments([]);
         adjustHeight(true);
         setIsTyping(true);
 
         try {
+            // Check if user wants image generation
+            const imageKeywords = ['generate image', 'create image', 'draw', 'show me', 'visualize', 'picture', 'diagram'];
+            const needsImage = imageKeywords.some(keyword => 
+                value.toLowerCase().includes(keyword)
+            );
+
             const { data, error } = await supabase.functions.invoke('edudevadar-ai', {
                 body: { 
                     messages: [...messages, userMessage], 
-                    model: 'gemini' 
+                    model: 'gemini',
+                    generateImage: needsImage
                 }
             });
 
             if (error) throw error;
 
             const reply = data?.generatedText || "Sorry, I couldn't generate a response.";
-            setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+            const imageUrl = data?.image?.imageUrl;
+            
+            setMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: reply,
+                imageUrl: imageUrl
+            }]);
         } catch (error) {
             console.error('Neodevadar AI error:', error);
             setMessages(prev => [...prev, { 
@@ -299,31 +325,73 @@ export function AnimatedAIChat() {
         const input = document.createElement('input');
         input.type = 'file';
         input.multiple = true;
-        input.accept = 'image/*,video/*';
+        input.accept = 'image/*';
         input.onchange = (e) => {
             const target = e.target as HTMLInputElement;
             const files = Array.from(target.files || []);
-            const fileNames = files.map(file => file.name);
-            setAttachments(prev => [...prev, ...fileNames]);
+            
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setAttachments(prev => [...prev, {
+                        type: file.type,
+                        url: reader.result as string,
+                        name: file.name
+                    }]);
+                };
+                reader.readAsDataURL(file);
+            });
         };
         input.click();
     };
 
+    const startVoiceCall = async () => {
+        try {
+            toast({
+                title: "Starting voice call...",
+                description: "Connecting to AI assistant",
+            });
+
+            realtimeChatRef.current = new RealtimeChat((event) => {
+                if (event.type === 'response.audio_transcript.delta') {
+                    setIsSpeaking(true);
+                } else if (event.type === 'response.done') {
+                    setIsSpeaking(false);
+                }
+            });
+
+            await realtimeChatRef.current.init();
+            setIsVoiceCallActive(true);
+
+            toast({
+                title: "Voice call started",
+                description: "Speak to the AI assistant",
+            });
+        } catch (error) {
+            console.error('Error starting voice call:', error);
+            toast({
+                title: "Failed to start voice call",
+                description: error instanceof Error ? error.message : "Unknown error",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const endVoiceCall = () => {
+        realtimeChatRef.current?.disconnect();
+        setIsVoiceCallActive(false);
+        setIsSpeaking(false);
+        
+        toast({
+            title: "Voice call ended",
+        });
+    };
+
     const handleVoiceInput = () => {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-            const recognition = new SpeechRecognition();
-            
-            recognition.continuous = false;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-
-            recognition.onresult = (event: any) => {
-                const transcript = event.results[0][0].transcript;
-                setValue(transcript);
-            };
-
-            recognition.start();
+        if (isVoiceCallActive) {
+            endVoiceCall();
+        } else {
+            startVoiceCall();
         }
     };
 
@@ -391,8 +459,8 @@ export function AnimatedAIChat() {
                             <motion.div
                                 key={index}
                                 className={cn(
-                                    "flex",
-                                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                                    "flex flex-col",
+                                    message.role === 'user' ? 'items-end' : 'items-start'
                                 )}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -405,6 +473,34 @@ export function AnimatedAIChat() {
                                         : 'bg-white/[0.05] text-white/90 border border-white/[0.1]'
                                 )}>
                                     {message.content}
+                                    
+                                    {/* Display attachments in user messages */}
+                                    {message.attachments && message.attachments.length > 0 && (
+                                        <div className="mt-2 space-y-2">
+                                            {message.attachments.map((attachment, i) => (
+                                                <div key={i}>
+                                                    {attachment.type.startsWith('image/') && (
+                                                        <img 
+                                                            src={attachment.url} 
+                                                            alt={attachment.name}
+                                                            className="rounded-lg max-w-full h-auto"
+                                                        />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                    
+                                    {/* Display generated images in assistant messages */}
+                                    {message.imageUrl && (
+                                        <div className="mt-2">
+                                            <img 
+                                                src={message.imageUrl} 
+                                                alt="Generated"
+                                                className="rounded-lg max-w-full h-auto"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </motion.div>
                         ))}
@@ -499,15 +595,19 @@ export function AnimatedAIChat() {
                                 {attachments.map((file, index) => (
                                     <motion.div
                                         key={index}
-                                        className="flex items-center gap-2 text-xs bg-white/[0.03] py-1.5 px-3 rounded-lg text-white/70"
+                                        className="relative"
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.9 }}
                                     >
-                                        <span>{file}</span>
-                                        <button 
+                                        <img 
+                                            src={file.url} 
+                                            alt={file.name}
+                                            className="h-20 w-20 object-cover rounded-lg"
+                                        />
+                                        <button
                                             onClick={() => removeAttachment(index)}
-                                            className="text-white/40 hover:text-white transition-colors"
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                                         >
                                             <XIcon className="w-3 h-3" />
                                         </button>
@@ -523,13 +623,29 @@ export function AnimatedAIChat() {
                                 type="button"
                                 onClick={handleVoiceInput}
                                 whileTap={{ scale: 0.94 }}
-                                className="p-2 text-white/40 hover:text-white/90 rounded-lg transition-colors relative group"
+                                className={cn(
+                                    "p-2 rounded-lg transition-colors relative group",
+                                    isVoiceCallActive 
+                                        ? "text-red-500 hover:text-red-600 bg-red-500/10" 
+                                        : "text-white/40 hover:text-white/90"
+                                )}
                             >
-                                <Mic className="w-4 h-4" />
+                                {isVoiceCallActive ? (
+                                    <PhoneOff className="w-4 h-4" />
+                                ) : (
+                                    <Phone className="w-4 h-4" />
+                                )}
                                 <motion.span
                                     className="absolute inset-0 bg-white/[0.05] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
                                     layoutId="button-highlight"
                                 />
+                                {isSpeaking && (
+                                    <motion.div
+                                        className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"
+                                        animate={{ scale: [1, 1.2, 1] }}
+                                        transition={{ repeat: Infinity, duration: 1 }}
+                                    />
+                                )}
                             </motion.button>
                             <motion.button
                                 type="button"
