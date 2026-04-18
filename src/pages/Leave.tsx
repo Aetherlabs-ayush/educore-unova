@@ -121,78 +121,51 @@ const Leave = () => {
     }
   };
 
-  // Check if user has a profile
   if (!currentUser) {
     return (
-      <div className="min-h-screen w-full px-8 py-10 bg-gradient-to-tr from-slate-50 via-white to-blue-50">
-        <main className="max-w-2xl mx-auto">
-          <div className="mb-6">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="mb-4 hover:bg-blue-50"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+      <div className="min-h-screen bg-gradient-to-b from-background to-accent/30 px-4 py-6 pb-24">
+        <div className="max-w-md mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-full">
+              <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-3xl font-bold text-blue-900 mb-2">Profile Required</h1>
-            <p className="text-slate-600">You need to create your profile before submitting a leave application.</p>
+            <h1 className="text-2xl font-bold tracking-tight">Leave Application</h1>
           </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <p className="text-lg text-slate-700 mb-6">
-              Please create your profile first to submit leave applications.
-            </p>
-            <Button
-              onClick={() => navigate('/profile')}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
+          <div className="bg-card rounded-3xl shadow-[var(--shadow-card)] p-8 text-center">
+            <p className="text-base mb-6">Please create your profile first to submit leave applications.</p>
+            <Button onClick={() => navigate('/profile')} className="rounded-2xl w-full" size="lg">
               Create Profile
             </Button>
           </div>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen w-full px-8 py-10 bg-gradient-to-tr from-slate-50 via-white to-blue-50">
-      <main className="max-w-2xl mx-auto">
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/')}
-            className="mb-4 hover:bg-blue-50"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+    <div className="min-h-screen bg-gradient-to-b from-background to-accent/30 px-4 py-6 pb-24">
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center gap-3 mb-6">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="rounded-full">
+            <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-3xl font-bold text-blue-900 mb-2">Submit Leave Application</h1>
-          <p className="text-slate-600">Fill out the form below to submit your leave request</p>
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <strong>Submitting as:</strong> {currentUser.name} (Class: {currentUser.class}, Division: {currentUser.division})
-            </p>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Leave Application</h1>
+            <p className="text-sm text-muted-foreground">{currentUser.name} · Class {currentUser.class}-{currentUser.division}</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="bg-card rounded-3xl shadow-[var(--shadow-card)] p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
                 control={form.control}
                 name="numberOfDays"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-blue-900 font-semibold">Number of Days</FormLabel>
+                    <FormLabel className="font-semibold">Number of Days</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Enter number of days"
-                        type="number"
-                        min="1"
-                        className="border-slate-300 focus:border-blue-500"
-                        {...field}
-                      />
+                      <Input placeholder="e.g. 3" type="number" min="1" className="rounded-2xl h-12" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -204,35 +177,18 @@ const Leave = () => {
                 name="startDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel className="text-blue-900 font-semibold">Start Date</FormLabel>
+                    <FormLabel className="font-semibold">Start Date</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              'w-full pl-3 text-left font-normal border-slate-300 focus:border-blue-500',
-                              !field.value && 'text-muted-foreground'
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, 'PPP')
-                            ) : (
-                              <span>Pick start date</span>
-                            )}
+                          <Button variant="outline" className={cn('w-full h-12 rounded-2xl pl-4 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                            {field.value ? format(field.value, 'PPP') : <span>Pick start date</span>}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) => date < new Date()}
-                          initialFocus
-                          className={cn("p-3 pointer-events-auto")}
-                        />
+                      <PopoverContent className="w-auto p-0 rounded-2xl" align="start">
+                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date()} initialFocus className={cn("p-3 pointer-events-auto")} />
                       </PopoverContent>
                     </Popover>
                     <FormMessage />
@@ -245,35 +201,18 @@ const Leave = () => {
                 name="returnDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel className="text-blue-900 font-semibold">Return Date</FormLabel>
+                    <FormLabel className="font-semibold">Return Date</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              'w-full pl-3 text-left font-normal border-slate-300 focus:border-blue-500',
-                              !field.value && 'text-muted-foreground'
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, 'PPP')
-                            ) : (
-                              <span>Pick return date</span>
-                            )}
+                          <Button variant="outline" className={cn('w-full h-12 rounded-2xl pl-4 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                            {field.value ? format(field.value, 'PPP') : <span>Pick return date</span>}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) => date < new Date()}
-                          initialFocus
-                          className={cn("p-3 pointer-events-auto")}
-                        />
+                      <PopoverContent className="w-auto p-0 rounded-2xl" align="start">
+                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date()} initialFocus className={cn("p-3 pointer-events-auto")} />
                       </PopoverContent>
                     </Popover>
                     <FormMessage />
@@ -286,39 +225,27 @@ const Leave = () => {
                 name="reason"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-blue-900 font-semibold">Reason for Leave</FormLabel>
+                    <FormLabel className="font-semibold">Reason</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Please provide a detailed reason for your leave request..."
-                        className="min-h-[100px] border-slate-300 focus:border-blue-500"
-                        {...field}
-                      />
+                      <Textarea placeholder="Please provide a detailed reason..." className="min-h-[120px] rounded-2xl resize-none" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="flex gap-4 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate('/')}
-                  className="flex-1 border-slate-300 hover:bg-slate-50"
-                >
+              <div className="flex gap-3 pt-2">
+                <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1 rounded-2xl h-12">
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Submit Leave Application
+                <Button type="submit" className="flex-1 rounded-2xl h-12">
+                  Submit
                 </Button>
               </div>
             </form>
           </Form>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
