@@ -431,21 +431,20 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full pt-12 animate-fade-in">
-      {isTeacher() && (
-        <Link to="/teacher-profile-create">
-          <Button className="mb-4 bg-green-600 hover:bg-green-700">
-            Create Teacher Profile
-          </Button>
-        </Link>
-      )}
-      <Card className="w-full max-w-sm shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl text-blue-800 text-center">Profile</CardTitle>
-          <p className="text-sm text-center text-gray-600">
-            Your profile will be synced across all devices
-          </p>
-        </CardHeader>
+    <div className="min-h-screen bg-gradient-to-b from-background to-accent/30 px-4 py-6 pb-24 animate-fade-in">
+      <div className="max-w-md mx-auto">
+        {isTeacher() && (
+          <Link to="/teacher-profile-create">
+            <Button className="mb-4 w-full rounded-2xl h-12">
+              Create Teacher Profile
+            </Button>
+          </Link>
+        )}
+        <Card className="rounded-3xl border-0 shadow-[var(--shadow-card)]">
+          <CardHeader className="text-center pb-2">
+            <CardTitle className="text-2xl tracking-tight">Your Profile</CardTitle>
+            <p className="text-xs text-muted-foreground">Synced across all your devices</p>
+          </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
             <div className="flex flex-col items-center px-2 mb-2">
@@ -582,6 +581,7 @@ const Profile = () => {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
