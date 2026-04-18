@@ -1,15 +1,14 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Home, Download, Bell, User, Lock } from "lucide-react";
 import { useState } from "react";
 import TeachersAccessModal from "./TeachersAccessModal";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/", label: "Home", icon: Home },
-  { to: "/downloads", label: "Study Materials", icon: Download },
-  { to: "/notifications", label: "Notifications", icon: Bell },
-  { to: "/profile", label: "Profile", icon: User }
-  // "For Teachers" removed here, it's a special button below
+  { to: "/downloads", label: "Materials", icon: Download },
+  { to: "/notifications", label: "Alerts", icon: Bell },
+  { to: "/profile", label: "Profile", icon: User },
 ];
 
 const BottomNav = () => {
@@ -18,28 +17,33 @@ const BottomNav = () => {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 w-full bg-white border-t z-50 shadow md:hidden">
-        <ul className="flex justify-around items-center py-2 px-2">
-          {navItems.map(({ to, label, icon: Icon }) => (
-            <li key={to}>
-              <Link
-                to={to}
-                className={`flex flex-col items-center justify-center gap-0.5 text-xs font-medium transition text-slate-600 hover:text-blue-700 ${pathname === to ? "text-blue-700" : ""}`}
-              >
-                <Icon size={22} />
-                {label}
-              </Link>
-            </li>
-          ))}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-3 pt-2 bg-background/80 backdrop-blur-xl border-t border-border/50">
+        <ul className="flex justify-around items-center max-w-md mx-auto">
+          {navItems.map(({ to, label, icon: Icon }) => {
+            const active = pathname === to;
+            return (
+              <li key={to}>
+                <Link
+                  to={to}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-2xl transition-all",
+                    active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Icon size={22} strokeWidth={active ? 2.5 : 2} />
+                  <span className={cn("text-[10px] font-medium", active && "font-semibold")}>{label}</span>
+                </Link>
+              </li>
+            );
+          })}
           <li>
             <button
-              className="flex flex-col items-center justify-center gap-0.5 text-xs font-medium transition text-slate-600 hover:text-blue-700 focus-visible:outline-none"
               onClick={() => setModalOpen(true)}
-              aria-label="For Teachers"
+              className="flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-2xl text-muted-foreground hover:text-foreground transition-all"
               type="button"
             >
               <Lock size={22} />
-              For Teachers
+              <span className="text-[10px] font-medium">Teachers</span>
             </button>
           </li>
         </ul>
@@ -50,4 +54,3 @@ const BottomNav = () => {
 };
 
 export default BottomNav;
-

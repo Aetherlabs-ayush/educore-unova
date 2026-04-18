@@ -116,7 +116,7 @@ const ClubApplication = () => {
         <div className="flex items-center gap-4 mb-8">
           <Button 
             variant="outline" 
-            onClick={() => navigate('/extra-curriculars')}
+            onClick={() => navigate('/notes-assignments')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />

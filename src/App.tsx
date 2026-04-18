@@ -14,13 +14,12 @@ import BottomNav from "./components/BottomNav";
 import Timetable from "./pages/Timetable";
 import LiveChatPage from "./pages/LiveChatPage";
 import WhatsAppChatPage from "./pages/WhatsAppChatPage";
-import DevadarMedia from "./pages/DevadarMedia";
 import Leave from "./pages/Leave";
 import TeacherChat from "./pages/TeacherChat";
 import TeacherMessagesPage from "./pages/TeacherMessagesPage";
 import Progress from "./pages/Progress";
 import Attendance from "./pages/Attendance";
-import ExtraCurriculars from "./pages/ExtraCurriculars";
+import NotesAssignments from "./pages/NotesAssignments";
 import ClubApplication from "./pages/ClubApplication";
 import ClubApplications from "./pages/ClubApplications";
 import ClubChat from "./pages/ClubChat";
@@ -51,21 +50,20 @@ const App = () => (
             <Route path="/textbooks" element={<Textbooks />} />
             <Route path="/timetable" element={<Timetable />} />
             <Route path="/chat" element={<LiveChatPage />} />
-        <Route path="/whatsapp-chat" element={<WhatsAppChatPage />} />
-        <Route path="/devadar-media" element={<DevadarMedia />} />
+            <Route path="/whatsapp-chat" element={<WhatsAppChatPage />} />
             <Route path="/leave" element={<Leave />} />
             <Route path="/teacher-chat" element={<TeacherChat />} />
             <Route path="/teacher-messages" element={<TeacherMessages />} />
             <Route path="/teacher-student-chat" element={<TeacherStudentChat />} />
             <Route path="/progress" element={<Progress />} />
             <Route path="/attendance" element={<Attendance />} />
-            <Route path="/extra-curriculars" element={<ExtraCurriculars />} />
+            <Route path="/notes-assignments" element={<NotesAssignments />} />
             <Route path="/club-application/:clubId" element={<ClubApplication />} />
             <Route path="/club-applications/:clubId" element={<ClubApplications />} />
             <Route path="/club-chat/:clubId" element={<ClubChat />} />
-        <Route path="/teacher-profile-setup" element={<TeacherProfileSetup />} />
-        <Route path="/teacher-live-chat/:teacherId" element={<TeacherLiveChat />} />
-          <Route path="/media-upload" element={<MediaUpload />} />
+            <Route path="/teacher-profile-setup" element={<TeacherProfileSetup />} />
+            <Route path="/teacher-live-chat/:teacherId" element={<TeacherLiveChat />} />
+            <Route path="/media-upload" element={<MediaUpload />} />
             <Route path="/teacher-profile-create" element={<TeacherProfileCreate />} />
             <Route path="/view-all-teachers" element={<ViewAllTeachers />} />
             <Route path="/teacher-exam-scores" element={<TeacherExamScores />} />
