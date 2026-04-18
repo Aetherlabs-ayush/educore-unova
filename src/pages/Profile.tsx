@@ -581,6 +581,7 @@ const Profile = () => {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
