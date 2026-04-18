@@ -41,7 +41,7 @@ const MediaUpload = () => {
           </Link>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Upload Media</h1>
-            <p className="text-gray-600">Upload videos and photos for Devadar Media</p>
+            <p className="text-gray-600">Upload videos and photos for BTC</p>
           </div>
         </div>
 

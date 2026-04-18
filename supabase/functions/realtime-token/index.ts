@@ -26,7 +26,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "gpt-4o-realtime-preview-2024-12-17",
         voice: "alloy",
-        instructions: "You are Neodevadar AI, a helpful study assistant for a school app. Provide clear, concise, and educational responses. Be friendly and encouraging to students."
+        instructions: "You are BTC AI, a helpful study assistant for a tuition app. Provide clear, concise, and educational responses. Be friendly and encouraging to students."
       }),
     });
 

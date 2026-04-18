@@ -57,8 +57,8 @@ const LOCAL_STORAGE_KEY = "student-profiles";
 const TEACHER_LOGIN_KEY = "teacher-logged-in";
 
 // Hardcoded credentials
-const TEACHER_USERNAME = "devadar";
-const TEACHER_PASSWORD = "dghsstanur";
+const TEACHER_USERNAME = "btc";
+const TEACHER_PASSWORD = "btc";
 
 const getStoredProfiles = (): Profile[] => {
   try {

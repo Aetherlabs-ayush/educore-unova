@@ -1,59 +1,39 @@
-
 import DashboardHero from "@/components/DashboardHero";
 import CourseList from "@/components/CourseList";
 import FloatingChatButton from "@/components/FloatingChatButton";
 import AIFloatingButton from "@/components/AIFloatingButton";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { MessageCircle, TrendingUp, Calendar } from "lucide-react";
+import { MessageCircle, TrendingUp, Calendar, BookOpen } from "lucide-react";
+
+const tiles = [
+  { to: "/view-all-teachers", label: "Teachers", icon: MessageCircle, color: "from-blue-500 to-blue-600" },
+  { to: "/progress", label: "Progress", icon: TrendingUp, color: "from-emerald-500 to-emerald-600" },
+  { to: "/attendance", label: "Attendance", icon: Calendar, color: "from-violet-500 to-violet-600" },
+  { to: "/notes-assignments", label: "Notes & Tasks", icon: BookOpen, color: "from-amber-500 to-orange-500" },
+];
 
 const Index = () => {
   return (
-    <div className="min-h-screen w-full px-8 py-10 bg-gradient-to-tr from-slate-50 via-white to-blue-50 animate-fade-in">
+    <div className="min-h-screen w-full bg-gradient-to-b from-background to-accent/40 px-4 py-6 pb-24 animate-fade-in">
       <main className="max-w-6xl mx-auto">
         <DashboardHero />
-        {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          <Link to="/view-all-teachers">
-            <Button className="w-full h-16 text-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg">
-              <MessageCircle className="mr-3 h-6 w-6" />
-              View All Teachers
-            </Button>
-          </Link>
-          <Link to="/progress">
-            <Button className="w-full h-16 text-lg font-semibold bg-green-600 hover:bg-green-700 text-white shadow-lg">
-              <TrendingUp className="mr-3 h-6 w-6" />
-              Progress Tracker
-            </Button>
-          </Link>
-          <Link to="/attendance">
-            <Button className="w-full h-16 text-lg font-semibold bg-purple-600 hover:bg-purple-700 text-white shadow-lg">
-              <Calendar className="mr-3 h-6 w-6" />
-              Your Attendance
-            </Button>
-          </Link>
-          <Link to="/extra-curriculars">
-            <Button className="w-full h-16 text-lg font-semibold bg-orange-600 hover:bg-orange-700 text-white shadow-lg">
-              <Calendar className="mr-3 h-6 w-6" />
-              Extra Curriculars
-            </Button>
-          </Link>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          {tiles.map(({ to, label, icon: Icon, color }) => (
+            <Link key={to} to={to}>
+              <div className={`group rounded-3xl p-4 bg-gradient-to-br ${color} text-white shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elegant)] active:scale-[0.97] transition-all`}>
+                <div className="h-10 w-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <p className="font-semibold text-sm leading-tight">{label}</p>
+              </div>
+            </Link>
+          ))}
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          <Link to="/devadar-media">
-            <Button className="w-full h-16 text-lg font-semibold bg-red-600 hover:bg-red-700 text-white shadow-lg">
-              <MessageCircle className="mr-3 h-6 w-6" />
-              Devadar Media
-            </Button>
-          </Link>
-        </div>
-        
-        <div className="flex flex-col md:flex-row gap-10">
-          <section className="flex-1">
-            <CourseList />
-          </section>
-        </div>
+
+        <section>
+          <CourseList />
+        </section>
       </main>
       <AIFloatingButton />
       <FloatingChatButton />

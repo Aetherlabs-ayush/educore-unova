@@ -311,10 +311,13 @@ export function AnimatedAIChat() {
                 imageUrl: imageUrl
             }]);
         } catch (error) {
-            console.error('Neodevadar AI error:', error);
+            console.error('BTC AI error:', error);
+            const msg = (error as any)?.context?.body?.error
+                || (error as any)?.message
+                || "I encountered an issue. Please try again.";
             setMessages(prev => [...prev, { 
                 role: 'assistant', 
-                content: "I encountered an issue. Please try again." 
+                content: typeof msg === 'string' ? msg : "I encountered an issue. Please try again."
             }]);
         } finally {
             setIsTyping(false);
@@ -565,7 +568,7 @@ export function AnimatedAIChat() {
                             onKeyDown={handleKeyDown}
                             onFocus={() => setInputFocused(true)}
                             onBlur={() => setInputFocused(false)}
-                            placeholder="Ask Neodevadar AI a question..."
+                            placeholder="Ask BTC AI a question..."
                             containerClassName="w-full"
                             className={cn(
                                 "w-full px-4 py-3",
