@@ -1,6 +1,4 @@
-import { GraduationCap, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { GraduationCap, Sparkles, BookOpen, MessageCircle, CalendarDays } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const DashboardHero = () => {
@@ -11,7 +9,7 @@ const DashboardHero = () => {
   }, []);
 
   return (
-    <header className="relative overflow-hidden rounded-3xl mb-6 p-6 bg-[var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-elegant)]">
+    <header className="relative overflow-hidden rounded-[2rem] mb-6 p-6 bg-[var(--gradient-primary)] text-primary-foreground shadow-[var(--shadow-elegant)]">
       <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-16 -left-8 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
       <div className="relative flex items-start gap-4">
@@ -23,22 +21,28 @@ const DashboardHero = () => {
             <Sparkles size={12} /> Welcome to BTC
           </div>
           <h1 className="text-2xl font-bold tracking-tight mb-2">Your Tuition Hub</h1>
-          <p className="text-sm text-white/90 mb-4 leading-relaxed">
+          <p className="text-sm text-white/90 mb-5 leading-relaxed">
             Courses, assignments, progress and more — all in one place.
           </p>
-          <div className="flex flex-wrap gap-2">
-            <Link to="/courses">
-              <Button size="sm" variant="secondary" className="rounded-full font-semibold shadow-md">
-                Browse Courses
-              </Button>
-            </Link>
-            {isTeacher && (
-              <Link to="/teacher-exam-scores">
-                <Button size="sm" className="rounded-full bg-white text-primary hover:bg-white/90 font-semibold shadow-md">
-                  Upload Exam Scores
-                </Button>
-              </Link>
-            )}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="rounded-[1.5rem] bg-white/16 backdrop-blur-md px-4 py-4 border border-white/15">
+              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                <BookOpen size={16} /> Study Plan
+              </div>
+              <p className="mt-2 text-xs text-white/80">Keep your notes, homework, and class tasks organized.</p>
+            </div>
+            <div className="rounded-[1.5rem] bg-white/16 backdrop-blur-md px-4 py-4 border border-white/15">
+              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                <MessageCircle size={16} /> Teacher Support
+              </div>
+              <p className="mt-2 text-xs text-white/80">Reach teachers and live chat spaces from one clean dashboard.</p>
+            </div>
+            <div className="rounded-[1.5rem] bg-white/16 backdrop-blur-md px-4 py-4 border border-white/15">
+              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                <CalendarDays size={16} /> Daily Flow
+              </div>
+              <p className="mt-2 text-xs text-white/80">Track attendance, lessons, and upcoming submissions with ease.</p>
+            </div>
           </div>
         </div>
       </div>
