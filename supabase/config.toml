@@ -1,1 +1,7 @@
 project_id = "mivabrtbxkqwkcmnhdfr"
+
+[functions.edudevadar-ai]
+verify_jwt = false
+
+[functions.realtime-token]
+verify_jwt = false
