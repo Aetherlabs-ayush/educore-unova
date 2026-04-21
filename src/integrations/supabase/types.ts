@@ -14,7 +14,486 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance: {
+        Row: {
+          class: string | null
+          created_at: string
+          date: string
+          division: string | null
+          id: string
+          status: string
+          student_name: string | null
+          student_phone: string
+        }
+        Insert: {
+          class?: string | null
+          created_at?: string
+          date?: string
+          division?: string | null
+          id?: string
+          status?: string
+          student_name?: string | null
+          student_phone: string
+        }
+        Update: {
+          class?: string | null
+          created_at?: string
+          date?: string
+          division?: string | null
+          id?: string
+          status?: string
+          student_name?: string | null
+          student_phone?: string
+        }
+        Relationships: []
+      }
+      club_applications: {
+        Row: {
+          club_id: string | null
+          club_name: string | null
+          created_at: string
+          id: string
+          status: string
+          student_name: string | null
+          student_phone: string
+        }
+        Insert: {
+          club_id?: string | null
+          club_name?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          student_name?: string | null
+          student_phone: string
+        }
+        Update: {
+          club_id?: string | null
+          club_name?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          student_name?: string | null
+          student_phone?: string
+        }
+        Relationships: []
+      }
+      club_chat_messages: {
+        Row: {
+          club_id: string | null
+          created_at: string
+          id: string
+          sender_name: string | null
+          sender_phone: string
+          text: string
+        }
+        Insert: {
+          club_id?: string | null
+          created_at?: string
+          id?: string
+          sender_name?: string | null
+          sender_phone: string
+          text: string
+        }
+        Update: {
+          club_id?: string | null
+          created_at?: string
+          id?: string
+          sender_name?: string | null
+          sender_phone?: string
+          text?: string
+        }
+        Relationships: []
+      }
+      clubs: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image: string | null
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string | null
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      homework_status: {
+        Row: {
+          assignment_id: string
+          created_at: string
+          due_date: string | null
+          id: string
+          status: string
+          student_phone: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          assignment_id: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          status?: string
+          student_phone: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assignment_id?: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          status?: string
+          student_phone?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      leave_applications: {
+        Row: {
+          class: string | null
+          created_at: string
+          division: string | null
+          from_date: string
+          id: string
+          reason: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          student_name: string | null
+          student_phone: string
+          to_date: string
+          updated_at: string
+        }
+        Insert: {
+          class?: string | null
+          created_at?: string
+          division?: string | null
+          from_date: string
+          id?: string
+          reason: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          student_name?: string | null
+          student_phone: string
+          to_date: string
+          updated_at?: string
+        }
+        Update: {
+          class?: string | null
+          created_at?: string
+          division?: string | null
+          from_date?: string
+          id?: string
+          reason?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          student_name?: string | null
+          student_phone?: string
+          to_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          created_at: string
+          id: string
+          read: boolean
+          receiver_phone: string | null
+          room: string | null
+          sender_name: string | null
+          sender_phone: string
+          text: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_phone?: string | null
+          room?: string | null
+          sender_name?: string | null
+          sender_phone: string
+          text: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_phone?: string | null
+          room?: string | null
+          sender_name?: string | null
+          sender_phone?: string
+          text?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          read: boolean
+          target_phone: string | null
+          target_role: string | null
+          title: string
+          type: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          read?: boolean
+          target_phone?: string | null
+          target_role?: string | null
+          title: string
+          type?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          read?: boolean
+          target_phone?: string | null
+          target_role?: string | null
+          title?: string
+          type?: string | null
+        }
+        Relationships: []
+      }
+      public_profiles: {
+        Row: {
+          class: string | null
+          created_at: string
+          division: string | null
+          dob: string | null
+          id: string
+          image: string | null
+          name: string
+          phone: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          class?: string | null
+          created_at?: string
+          division?: string | null
+          dob?: string | null
+          id?: string
+          image?: string | null
+          name: string
+          phone: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          class?: string | null
+          created_at?: string
+          division?: string | null
+          dob?: string | null
+          id?: string
+          image?: string | null
+          name?: string
+          phone?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      teacher_messages: {
+        Row: {
+          created_at: string
+          id: string
+          read: boolean
+          receiver_phone: string
+          sender_name: string | null
+          sender_phone: string
+          text: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_phone: string
+          sender_name?: string | null
+          sender_phone: string
+          text: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_phone?: string
+          sender_name?: string | null
+          sender_phone?: string
+          text?: string
+        }
+        Relationships: []
+      }
+      teachers: {
+        Row: {
+          bio: string | null
+          created_at: string
+          email: string | null
+          id: string
+          image: string | null
+          name: string
+          phone: string | null
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          image?: string | null
+          name: string
+          phone?: string | null
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          image?: string | null
+          name?: string
+          phone?: string | null
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      test_scores: {
+        Row: {
+          class: string | null
+          created_at: string
+          date: string
+          division: string | null
+          exam_name: string | null
+          id: string
+          max_score: number
+          score: number
+          student_name: string | null
+          student_phone: string
+          subject: string
+        }
+        Insert: {
+          class?: string | null
+          created_at?: string
+          date?: string
+          division?: string | null
+          exam_name?: string | null
+          id?: string
+          max_score?: number
+          score?: number
+          student_name?: string | null
+          student_phone: string
+          subject: string
+        }
+        Update: {
+          class?: string | null
+          created_at?: string
+          date?: string
+          division?: string | null
+          exam_name?: string | null
+          id?: string
+          max_score?: number
+          score?: number
+          student_name?: string | null
+          student_phone?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      timetable: {
+        Row: {
+          class: string | null
+          created_at: string
+          day: string
+          division: string | null
+          end_time: string | null
+          id: string
+          period: number
+          start_time: string | null
+          subject: string
+          teacher: string | null
+        }
+        Insert: {
+          class?: string | null
+          created_at?: string
+          day: string
+          division?: string | null
+          end_time?: string | null
+          id?: string
+          period?: number
+          start_time?: string | null
+          subject: string
+          teacher?: string | null
+        }
+        Update: {
+          class?: string | null
+          created_at?: string
+          day?: string
+          division?: string | null
+          end_time?: string | null
+          id?: string
+          period?: number
+          start_time?: string | null
+          subject?: string
+          teacher?: string | null
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          is_online: boolean
+          last_seen: string
+          name: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_online?: boolean
+          last_seen?: string
+          name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_online?: boolean
+          last_seen?: string
+          name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
