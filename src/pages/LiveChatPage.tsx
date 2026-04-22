@@ -130,7 +130,7 @@ const LiveChatPage = () => {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-secondary overflow-hidden">
+    <div className="fixed inset-0 flex h-[100dvh] flex-col bg-secondary overflow-hidden">
       {/* Header */}
       <div className="bg-card/90 backdrop-blur-xl border-b border-border/50 px-4 py-3 flex items-center gap-3 shrink-0 pt-[max(env(safe-area-inset-top),0.75rem)]">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full">
@@ -143,33 +143,39 @@ const LiveChatPage = () => {
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-4 space-y-2 bg-secondary pb-24">
-        {messages.map((msg) => {
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-secondary px-2.5 pb-28 pt-3">
+        {messages.map((msg, index) => {
           const isMe = msg.sender_name === currentUser?.name;
+          const previous = messages[index - 1];
+          const next = messages[index + 1];
+          const startsGroup = !previous || previous.sender_name !== msg.sender_name;
+          const endsGroup = !next || next.sender_name !== msg.sender_name;
           return (
-            <div key={msg.id} className={`flex gap-2 ${isMe ? "justify-end" : "justify-start"}`}>
-              {!isMe && (
-                <Avatar className="h-8 w-8 shrink-0">
+            <div key={msg.id} className={`flex items-end gap-1.5 ${startsGroup ? "mt-3" : "mt-0.5"} ${isMe ? "justify-end" : "justify-start"}`}>
+              {!isMe && endsGroup ? (
+                <Avatar className="h-7 w-7 shrink-0">
                   <AvatarImage src={msg.sender_image} />
-                  <AvatarFallback className="text-xs">{msg.sender_name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="text-[11px]">{msg.sender_name.charAt(0)}</AvatarFallback>
                 </Avatar>
-              )}
-              <div className={`max-w-[78%] ${isMe ? "items-end" : "items-start"} flex flex-col gap-0.5`}>
-                {!isMe && <p className="text-xs text-muted-foreground px-2">{msg.sender_name}</p>}
+              ) : !isMe ? (
+                <div className="h-7 w-7 shrink-0" />
+              ) : null}
+              <div className={`max-w-[76%] ${isMe ? "items-end" : "items-start"} flex flex-col`}>
+                {!isMe && startsGroup && <p className="mb-1 px-2 text-[11px] leading-none text-muted-foreground">{msg.sender_name}</p>}
                 <div
-                  className={`px-4 py-2.5 shadow-sm ${
+                  className={`px-3.5 py-2 text-[15px] leading-5 shadow-sm ${
                     isMe
-                      ? "bg-primary text-primary-foreground rounded-[1.35rem] rounded-br-md"
-                      : "bg-background text-foreground rounded-[1.35rem] rounded-bl-md border border-border/40"
+                      ? `bg-primary text-primary-foreground ${startsGroup ? "rounded-tr-[1.35rem]" : "rounded-tr-md"} ${endsGroup ? "rounded-br-md" : "rounded-br-[1.35rem]"} rounded-l-[1.35rem]`
+                      : `bg-background text-foreground ${startsGroup ? "rounded-tl-[1.35rem]" : "rounded-tl-md"} ${endsGroup ? "rounded-bl-md" : "rounded-bl-[1.35rem]"} rounded-r-[1.35rem] border border-border/40`
                   }`}
                 >
                   {msg.message_type === "image" && msg.file_url && (
-                    <img src={msg.file_url} alt="" className="rounded-2xl max-w-full mb-1" />
+                    <img src={msg.file_url} alt="Chat attachment" className="mb-1 max-w-full rounded-[1rem]" loading="lazy" />
                   )}
-                  <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
+                  <p className="whitespace-pre-wrap break-words">{msg.message}</p>
                 </div>
-                {isMe && (
-                  <button onClick={() => handleDeleteMessage(msg.id)} className="text-xs text-muted-foreground px-2 hover:text-destructive">
+                {isMe && endsGroup && (
+                  <button onClick={() => handleDeleteMessage(msg.id)} className="px-2 pt-0.5 text-[11px] leading-4 text-muted-foreground hover:text-destructive">
                     Delete
                   </button>
                 )}
@@ -181,12 +187,12 @@ const LiveChatPage = () => {
 
       {/* Input — bottom-aligned, follows keyboard */}
       <div
-        className="fixed left-0 right-0 z-20 bg-background/95 backdrop-blur-xl border-t border-border/50 px-3 py-2 pb-[max(env(safe-area-inset-bottom),0.5rem)]"
+        className="fixed left-0 right-0 z-20 border-t border-border/50 bg-background/95 px-2.5 py-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] backdrop-blur-xl"
         style={{ bottom: composerBottom }}
       >
         {selectedImage && (
           <div className="mb-2 relative inline-block">
-            <img src={selectedImage} alt="" className="h-16 w-16 object-cover rounded-2xl" />
+            <img src={selectedImage} alt="Selected attachment preview" className="h-16 w-16 object-cover rounded-2xl" />
             <button
               onClick={() => setSelectedImage(null)}
               className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full h-5 w-5 flex items-center justify-center"
@@ -195,24 +201,24 @@ const LiveChatPage = () => {
             </button>
           </div>
         )}
-        <div className="flex items-center gap-1 rounded-full bg-secondary px-1.5 py-1 shadow-[var(--shadow-card)]">
-          <Button variant="ghost" size="icon" onClick={handleImageUpload} className="rounded-full shrink-0 h-10 w-10">
-            <Paperclip className="h-5 w-5" />
+        <div className="flex items-center gap-1 rounded-full bg-secondary px-1 py-1 shadow-[var(--shadow-card)]">
+          <Button variant="ghost" size="icon" onClick={handleImageUpload} className="h-9 w-9 shrink-0 rounded-full">
+            <Paperclip className="h-4.5 w-4.5" />
           </Button>
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder="Message"
-            className="flex-1 rounded-full bg-background border border-border/60 h-10 px-4 shadow-none"
+            placeholder="iMessage"
+            className="h-9 flex-1 rounded-full border border-border/60 bg-background px-3.5 text-[16px] leading-none shadow-none placeholder:text-muted-foreground"
           />
           {newMessage.trim() || selectedImage ? (
-            <Button onClick={handleSendMessage} size="icon" className="rounded-full shrink-0 h-10 w-10">
+            <Button onClick={handleSendMessage} size="icon" className="h-9 w-9 shrink-0 rounded-full">
               <Send className="h-4 w-4" />
             </Button>
           ) : (
-            <Button variant="ghost" size="icon" onClick={handleVoiceInput} className="rounded-full shrink-0 h-10 w-10">
-              <Mic className="h-5 w-5" />
+            <Button variant="ghost" size="icon" onClick={handleVoiceInput} className="h-9 w-9 shrink-0 rounded-full">
+              <Mic className="h-4.5 w-4.5" />
             </Button>
           )}
         </div>
