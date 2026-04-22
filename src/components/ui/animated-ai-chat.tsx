@@ -287,14 +287,14 @@ export function AnimatedAIChat() {
 
         try {
             // Check if user wants image generation
-            const imageKeywords = ['generate image', 'create image', 'draw', 'show me', 'visualize', 'picture', 'diagram'];
+            const imageKeywords = ['generate image', 'create image', 'make an image', 'draw', 'show me', 'visualize', 'picture', 'image of', 'diagram', 'nano banana'];
             const needsImage = imageKeywords.some(keyword => 
                 value.toLowerCase().includes(keyword)
             );
 
             const { data, error } = await supabase.functions.invoke('edudevadar-ai', {
                 body: { 
-                    messages: [...messages, userMessage], 
+                    messages: [...messages, userMessage],
                     model: 'gemini',
                     generateImage: needsImage
                 }
@@ -302,7 +302,7 @@ export function AnimatedAIChat() {
 
             if (error) throw error;
 
-            const reply = data?.generatedText || "Sorry, I couldn't generate a response.";
+            const reply = data?.generatedText || (imageUrl ? "Here is your image." : "Sorry, I couldn't generate a response.");
             const imageUrl = data?.image?.imageUrl;
             
             setMessages(prev => [...prev, { 
@@ -688,11 +688,11 @@ export function AnimatedAIChat() {
                             onClick={handleSendMessage}
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.98 }}
-                            disabled={isTyping || !value.trim()}
+                            disabled={isTyping || (!value.trim() && attachments.length === 0)}
                             className={cn(
                                 "px-4 py-2 rounded-lg text-sm font-medium transition-all",
                                 "flex items-center gap-2",
-                                value.trim()
+                                value.trim() || attachments.length > 0
                                     ? "bg-white text-[#0A0A0B] shadow-lg shadow-white/10"
                                     : "bg-white/[0.05] text-white/40"
                             )}
