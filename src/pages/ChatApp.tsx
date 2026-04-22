@@ -190,7 +190,7 @@ const ChatApp = () => {
       
       if (directChat) {
         // Chat already exists, select it
-        const room = directChat.chat_rooms;
+        const room = Array.isArray(directChat.chat_rooms) ? directChat.chat_rooms[0] : directChat.chat_rooms;
         setSelectedChatRoom(room);
         return;
       }
