@@ -302,8 +302,8 @@ export function AnimatedAIChat() {
 
             if (error) throw error;
 
-            const reply = data?.generatedText || (imageUrl ? "Here is your image." : "Sorry, I couldn't generate a response.");
             const imageUrl = data?.image?.imageUrl;
+            const reply = data?.generatedText || (imageUrl ? "Here is your image." : "Sorry, I couldn't generate a response.");
             
             setMessages(prev => [...prev, { 
                 role: 'assistant', 
