@@ -13,7 +13,6 @@ const VoiceRecorderButton: React.FC<VoiceRecorderButtonProps> = ({ onSend, disab
   const [isLoading, setIsLoading] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Unified event handling for both mouse and touch devices
   const startRecording = async () => {
