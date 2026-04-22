@@ -31,6 +31,8 @@ serve(async (req) => {
     const lastMessage = String(chatMessages[chatMessages.length - 1]?.content || '');
     const imageKeywords = ['generate image', 'create image', 'draw', 'visualize', 'picture of', 'image of', 'diagram of'];
     const needsImage = generateImage === true || imageKeywords.some(k => lastMessage.toLowerCase().includes(k));
+    const searchKeywords = ['search web', 'search the web', 'look up', 'latest', 'current', 'today', 'news', 'web search'];
+    const needsSearch = searchKeywords.some(k => lastMessage.toLowerCase().includes(k));
 
     if (needsImage) {
       const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -63,6 +65,16 @@ serve(async (req) => {
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
+    let webContext = '';
+    if (needsSearch) {
+      const searchResp = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(lastMessage)}&format=json&no_html=1&skip_disambig=1`);
+      const searchData = await searchResp.json().catch(() => ({}));
+      const topics = Array.isArray(searchData.RelatedTopics)
+        ? searchData.RelatedTopics.flatMap((item: any) => item.Topics || [item]).slice(0, 5)
+        : [];
+      webContext = [searchData.AbstractText, ...topics.map((item: any) => item.Text)].filter(Boolean).join('\n');
+    }
+
     const resp = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -70,9 +82,9 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+          model: 'google/gemini-3-flash-preview',
         messages: [
-          { role: 'system', content: 'You are BTC AI, a helpful study assistant for a tuition app. Provide clear, detailed, well-structured answers with examples. Be friendly and encouraging.' },
+          { role: 'system', content: `You are BTC AI, a helpful study assistant for a tuition app. Give one clear final answer, not multiple alternative answers. If web context is provided, use it and mention only the most useful source facts. Be friendly and concise.\n\nWeb context:\n${webContext || 'No web context provided.'}` },
           ...chatMessages,
         ],
       }),

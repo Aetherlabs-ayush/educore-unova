@@ -1,4 +1,3 @@
-import DashboardHero from "@/components/DashboardHero";
 import CourseList from "@/components/CourseList";
 import FloatingChatButton from "@/components/FloatingChatButton";
 import AIFloatingButton from "@/components/AIFloatingButton";
@@ -16,8 +15,6 @@ const Index = () => {
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-background to-accent/40 px-4 py-6 pb-24 animate-fade-in">
       <main className="max-w-6xl mx-auto">
-        <DashboardHero />
-
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {tiles.map(({ to, label, icon: Icon, color }) => (
             <Link key={to} to={to}>
