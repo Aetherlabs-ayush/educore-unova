@@ -47,6 +47,69 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          created_at: string
+          file_url: string | null
+          id: string
+          message: string | null
+          message_type: string | null
+          sender_image: string | null
+          sender_name: string
+          sender_phone: string | null
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          message?: string | null
+          message_type?: string | null
+          sender_image?: string | null
+          sender_name: string
+          sender_phone?: string | null
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          message?: string | null
+          message_type?: string | null
+          sender_image?: string | null
+          sender_name?: string
+          sender_phone?: string | null
+          timestamp?: string
+        }
+        Relationships: []
+      }
+      chat_participants: {
+        Row: {
+          chat_id: string | null
+          created_at: string
+          id: string
+          user_id: string | null
+          user_name: string | null
+          user_phone: string | null
+        }
+        Insert: {
+          chat_id?: string | null
+          created_at?: string
+          id?: string
+          user_id?: string | null
+          user_name?: string | null
+          user_phone?: string | null
+        }
+        Update: {
+          chat_id?: string | null
+          created_at?: string
+          id?: string
+          user_id?: string | null
+          user_name?: string | null
+          user_phone?: string | null
+        }
+        Relationships: []
+      }
       club_applications: {
         Row: {
           club_id: string | null
@@ -54,6 +117,8 @@ export type Database = {
           created_at: string
           id: string
           status: string
+          student_class: string | null
+          student_division: string | null
           student_name: string | null
           student_phone: string
         }
@@ -63,6 +128,8 @@ export type Database = {
           created_at?: string
           id?: string
           status?: string
+          student_class?: string | null
+          student_division?: string | null
           student_name?: string | null
           student_phone: string
         }
@@ -72,6 +139,8 @@ export type Database = {
           created_at?: string
           id?: string
           status?: string
+          student_class?: string | null
+          student_division?: string | null
           student_name?: string | null
           student_phone?: string
         }
@@ -166,12 +235,19 @@ export type Database = {
           class: string | null
           created_at: string
           division: string | null
+          end_date: string | null
           from_date: string
           id: string
+          number_of_days: number | null
           reason: string
+          return_date: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          start_date: string | null
           status: string
+          student_class: string | null
+          student_division: string | null
+          student_dob: string | null
           student_name: string | null
           student_phone: string
           to_date: string
@@ -181,12 +257,19 @@ export type Database = {
           class?: string | null
           created_at?: string
           division?: string | null
+          end_date?: string | null
           from_date: string
           id?: string
+          number_of_days?: number | null
           reason: string
+          return_date?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          start_date?: string | null
           status?: string
+          student_class?: string | null
+          student_division?: string | null
+          student_dob?: string | null
           student_name?: string | null
           student_phone: string
           to_date: string
@@ -196,12 +279,19 @@ export type Database = {
           class?: string | null
           created_at?: string
           division?: string | null
+          end_date?: string | null
           from_date?: string
           id?: string
+          number_of_days?: number | null
           reason?: string
+          return_date?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          start_date?: string | null
           status?: string
+          student_class?: string | null
+          student_division?: string | null
+          student_dob?: string | null
           student_name?: string | null
           student_phone?: string
           to_date?: string
@@ -211,6 +301,7 @@ export type Database = {
       }
       messages: {
         Row: {
+          audio_url: string | null
           created_at: string
           id: string
           read: boolean
@@ -219,8 +310,10 @@ export type Database = {
           sender_name: string | null
           sender_phone: string
           text: string
+          timestamp: string
         }
         Insert: {
+          audio_url?: string | null
           created_at?: string
           id?: string
           read?: boolean
@@ -229,8 +322,10 @@ export type Database = {
           sender_name?: string | null
           sender_phone: string
           text: string
+          timestamp?: string
         }
         Update: {
+          audio_url?: string | null
           created_at?: string
           id?: string
           read?: boolean
@@ -239,6 +334,7 @@ export type Database = {
           sender_name?: string | null
           sender_phone?: string
           text?: string
+          timestamp?: string
         }
         Relationships: []
       }
@@ -246,30 +342,42 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_read: boolean
           message: string | null
           read: boolean
+          role: string | null
           target_phone: string | null
           target_role: string | null
+          target_user_phone: string | null
+          timestamp: string
           title: string
           type: string | null
         }
         Insert: {
           created_at?: string
           id?: string
+          is_read?: boolean
           message?: string | null
           read?: boolean
+          role?: string | null
           target_phone?: string | null
           target_role?: string | null
+          target_user_phone?: string | null
+          timestamp?: string
           title: string
           type?: string | null
         }
         Update: {
           created_at?: string
           id?: string
+          is_read?: boolean
           message?: string | null
           read?: boolean
+          role?: string | null
           target_phone?: string | null
           target_role?: string | null
+          target_user_phone?: string | null
+          timestamp?: string
           title?: string
           type?: string | null
         }
@@ -470,7 +578,7 @@ export type Database = {
           name: string | null
           phone: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -480,7 +588,7 @@ export type Database = {
           name?: string | null
           phone?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -490,7 +598,7 @@ export type Database = {
           name?: string | null
           phone?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
