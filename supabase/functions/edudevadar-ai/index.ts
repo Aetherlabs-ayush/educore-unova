@@ -24,12 +24,34 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const { messages, prompt, generateImage } = body;
 
+    const normalizeMessage = (m: any) => {
+      const attachments = Array.isArray(m.attachments) ? m.attachments : [];
+      const imageParts = attachments
+        .filter((a: any) => String(a?.type || '').startsWith('image/') && a?.url)
+        .map((a: any) => ({ type: 'image_url', image_url: { url: a.url } }));
+
+      if (imageParts.length) {
+        return {
+          role: m.role === 'assistant' ? 'assistant' : 'user',
+          content: [
+            { type: 'text', text: String(m.content || 'Analyze this image.') },
+            ...imageParts,
+          ],
+        };
+      }
+
+      return { role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content || '') };
+    };
+
     const chatMessages = Array.isArray(messages) && messages.length
-      ? messages.map((m: any) => ({ role: m.role, content: m.content }))
+      ? messages.map(normalizeMessage)
       : [{ role: 'user', content: String(prompt || 'Hello!') }];
 
-    const lastMessage = String(chatMessages[chatMessages.length - 1]?.content || '');
-    const imageKeywords = ['generate image', 'create image', 'draw', 'visualize', 'picture of', 'image of', 'diagram of'];
+    const lastContent = chatMessages[chatMessages.length - 1]?.content;
+    const lastMessage = Array.isArray(lastContent)
+      ? String(lastContent.find((part: any) => part.type === 'text')?.text || '')
+      : String(lastContent || '');
+    const imageKeywords = ['generate image', 'create image', 'draw', 'visualize', 'picture of', 'image of', 'diagram of', 'make an image'];
     const needsImage = generateImage === true || imageKeywords.some(k => lastMessage.toLowerCase().includes(k));
     const searchKeywords = ['search web', 'search the web', 'look up', 'latest', 'current', 'today', 'news', 'web search'];
     const needsSearch = searchKeywords.some(k => lastMessage.toLowerCase().includes(k));
@@ -42,7 +64,7 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash-image-preview',
+          model: 'google/gemini-2.5-flash-image',
           messages: [{ role: 'user', content: lastMessage }],
           modalities: ['image', 'text'],
         }),
@@ -84,7 +106,7 @@ serve(async (req) => {
       body: JSON.stringify({
           model: 'google/gemini-3-flash-preview',
         messages: [
-          { role: 'system', content: `You are BTC AI, a helpful study assistant for a tuition app. Give one clear final answer, not multiple alternative answers. If web context is provided, use it and mention only the most useful source facts. Be friendly and concise.\n\nWeb context:\n${webContext || 'No web context provided.'}` },
+          { role: 'system', content: `You are BTC AI, a helpful study assistant for a tuition app. Give exactly one clear final answer, not multiple alternative answers. If images are provided, analyze what is visible and answer the user's request. If web context is provided, use it and mention only the most useful source facts. Be friendly and concise.\n\nWeb context:\n${webContext || 'No web context provided.'}` },
           ...chatMessages,
         ],
       }),

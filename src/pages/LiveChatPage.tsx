@@ -23,7 +23,7 @@ const LiveChatPage = () => {
   const [newMessage, setNewMessage] = useState("");
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [composerBottom, setComposerBottom] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const LiveChatPage = () => {
 
     const syncKeyboardOffset = () => {
       const offset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-      setKeyboardOffset(offset);
+      setComposerBottom(offset);
     };
 
     viewport.addEventListener("resize", syncKeyboardOffset);
@@ -130,7 +130,7 @@ const LiveChatPage = () => {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-background overflow-hidden">
+    <div className="fixed inset-0 flex flex-col bg-secondary overflow-hidden">
       {/* Header */}
       <div className="bg-card/90 backdrop-blur-xl border-b border-border/50 px-4 py-3 flex items-center gap-3 shrink-0 pt-[max(env(safe-area-inset-top),0.75rem)]">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full">
@@ -143,7 +143,7 @@ const LiveChatPage = () => {
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-4 space-y-2 bg-muted/30">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-4 space-y-2 bg-secondary pb-24">
         {messages.map((msg) => {
           const isMe = msg.sender_name === currentUser?.name;
           return (
@@ -160,7 +160,7 @@ const LiveChatPage = () => {
                   className={`px-4 py-2.5 shadow-sm ${
                     isMe
                       ? "bg-primary text-primary-foreground rounded-[1.35rem] rounded-br-md"
-                      : "bg-card text-card-foreground rounded-[1.35rem] rounded-bl-md border border-border/40"
+                      : "bg-background text-foreground rounded-[1.35rem] rounded-bl-md border border-border/40"
                   }`}
                 >
                   {msg.message_type === "image" && msg.file_url && (
@@ -181,8 +181,8 @@ const LiveChatPage = () => {
 
       {/* Input — bottom-aligned, follows keyboard */}
       <div
-        className="bg-card/95 backdrop-blur-xl border-t border-border/50 px-3 py-2 shrink-0 pb-[max(env(safe-area-inset-bottom),0.5rem)]"
-        style={{ transform: `translateY(-${keyboardOffset}px)` }}
+        className="fixed left-0 right-0 z-20 bg-background/95 backdrop-blur-xl border-t border-border/50 px-3 py-2 pb-[max(env(safe-area-inset-bottom),0.5rem)]"
+        style={{ bottom: composerBottom }}
       >
         {selectedImage && (
           <div className="mb-2 relative inline-block">
@@ -195,7 +195,7 @@ const LiveChatPage = () => {
             </button>
           </div>
         )}
-        <div className="flex items-center gap-1 rounded-full bg-muted/80 px-1.5 py-1 shadow-[var(--shadow-card)]">
+        <div className="flex items-center gap-1 rounded-full bg-secondary px-1.5 py-1 shadow-[var(--shadow-card)]">
           <Button variant="ghost" size="icon" onClick={handleImageUpload} className="rounded-full shrink-0 h-10 w-10">
             <Paperclip className="h-5 w-5" />
           </Button>
@@ -204,7 +204,7 @@ const LiveChatPage = () => {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             placeholder="Message"
-            className="flex-1 rounded-full bg-background border-0 h-10 px-4 shadow-none"
+            className="flex-1 rounded-full bg-background border border-border/60 h-10 px-4 shadow-none"
           />
           {newMessage.trim() || selectedImage ? (
             <Button onClick={handleSendMessage} size="icon" className="rounded-full shrink-0 h-10 w-10">
