@@ -157,9 +157,9 @@ const LiveChatPage = () => {
   };
 
   return (
-    <div className="fixed inset-0 flex h-[100dvh] flex-col bg-secondary overflow-hidden">
+    <div className="fixed inset-0 flex h-[100dvh] flex-col overflow-hidden bg-[hsl(var(--imessage-background))] font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Text',sans-serif] text-foreground">
       {/* Header */}
-      <div className="bg-card/90 backdrop-blur-xl border-b border-border/50 px-4 py-3 flex items-center gap-3 shrink-0 pt-[max(env(safe-area-inset-top),0.75rem)]">
+      <div className="shrink-0 bg-[hsl(var(--imessage-background)/0.88)] px-4 py-3 pt-[max(env(safe-area-inset-top),0.75rem)] backdrop-blur-xl flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="rounded-full">
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -170,51 +170,87 @@ const LiveChatPage = () => {
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-secondary px-2.5 pb-28 pt-3">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-[hsl(var(--imessage-background))] px-2.5 pb-32 pt-2">
         {messages.map((msg, index) => {
           const isMe = msg.sender_name === currentUser?.name;
           const previous = messages[index - 1];
           const next = messages[index + 1];
           const startsGroup = !previous || previous.sender_name !== msg.sender_name;
           const endsGroup = !next || next.sender_name !== msg.sender_name;
+          const showTimestamp = startsGroup;
+          const isLatestSent = isMe && !messages.slice(index + 1).some((message) => message.sender_name === currentUser?.name);
           return (
-            <div key={msg.id} className={`flex items-end gap-1.5 ${startsGroup ? "mt-3" : "mt-0.5"} ${isMe ? "justify-end" : "justify-start"}`}>
-              {!isMe && endsGroup ? (
-                <Avatar className="h-7 w-7 shrink-0">
-                  <AvatarImage src={msg.sender_image} />
-                  <AvatarFallback className="text-[11px]">{msg.sender_name.charAt(0)}</AvatarFallback>
-                </Avatar>
-              ) : !isMe ? (
-                <div className="h-7 w-7 shrink-0" />
-              ) : null}
-              <div className={`max-w-[76%] ${isMe ? "items-end" : "items-start"} flex flex-col`}>
-                {!isMe && startsGroup && <p className="mb-1 px-2 text-[11px] leading-none text-muted-foreground">{msg.sender_name}</p>}
+            <div key={msg.id}>
+              {showTimestamp && (
+                <p className="py-2 text-center text-xs font-medium text-[hsl(var(--imessage-gray))]">{formatGroupTimestamp(msg.timestamp)}</p>
+              )}
+              <div className={`flex items-end gap-2 ${startsGroup ? "mt-3" : "mt-0.5"} ${isMe ? "justify-end" : "justify-start"}`}>
+                {!isMe && endsGroup ? (
+                  <Avatar className="h-8 w-8 shrink-0">
+                    <AvatarImage src={msg.sender_image} />
+                    <AvatarFallback className="text-xs">{msg.sender_name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                ) : !isMe ? (
+                  <div className="h-8 w-8 shrink-0" />
+                ) : null}
+              <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"} flex flex-col`}>
                 <div
-                  className={`px-3.5 py-2 text-[15px] leading-5 shadow-sm ${
+                  onContextMenu={(event) => {
+                    event.preventDefault();
+                    setActiveReactionFor(msg.id);
+                  }}
+                  onTouchStart={() => handleLongPressStart(msg.id)}
+                  onTouchEnd={handleLongPressEnd}
+                  onMouseDown={() => handleLongPressStart(msg.id)}
+                  onMouseUp={handleLongPressEnd}
+                  onMouseLeave={handleLongPressEnd}
+                  className={`relative px-[14px] py-[10px] text-[16px] leading-5 imessage-bubble-in ${
                     isMe
-                      ? `bg-primary text-primary-foreground ${startsGroup ? "rounded-tr-[1.35rem]" : "rounded-tr-md"} ${endsGroup ? "rounded-br-md" : "rounded-br-[1.35rem]"} rounded-l-[1.35rem]`
-                      : `bg-background text-foreground ${startsGroup ? "rounded-tl-[1.35rem]" : "rounded-tl-md"} ${endsGroup ? "rounded-bl-md" : "rounded-bl-[1.35rem]"} rounded-r-[1.35rem] border border-border/40`
+                      ? "rounded-[18px] rounded-br-[4px] bg-[hsl(var(--imessage-blue))] text-primary-foreground"
+                      : "rounded-[18px] rounded-bl-[4px] bg-[hsl(var(--imessage-received))] text-[hsl(var(--imessage-received-foreground))]"
                   }`}
                 >
+                  {activeReactionFor === msg.id && (
+                    <div className={`absolute -top-12 z-30 flex items-center gap-1 rounded-full bg-popover px-2 py-1.5 shadow-lg ${isMe ? "right-0" : "left-0"}`}>
+                      {reactionOptions.map((reaction) => (
+                        <button key={reaction} onClick={() => { setReactions((prev) => ({ ...prev, [msg.id]: reaction })); setActiveReactionFor(null); }} className="flex h-8 min-w-8 items-center justify-center rounded-full px-1 text-lg transition-transform hover:scale-110">
+                          {reaction}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {msg.message_type === "image" && msg.file_url && (
                     <img src={msg.file_url} alt="Chat attachment" className="mb-1 max-w-full rounded-[1rem]" loading="lazy" />
                   )}
                   <p className="whitespace-pre-wrap break-words">{msg.message}</p>
+                  {reactions[msg.id] && <span className={`absolute -bottom-3 ${isMe ? "right-1" : "left-1"} rounded-full bg-background px-1 text-sm shadow-sm`}>{reactions[msg.id]}</span>}
                 </div>
-                {isMe && endsGroup && (
+                {isMe && isLatestSent && <p className="pr-2 pt-1 text-[11px] leading-4 text-[hsl(var(--imessage-gray))]">Delivered</p>}
+                {isMe && endsGroup && !isLatestSent && (
                   <button onClick={() => handleDeleteMessage(msg.id)} className="px-2 pt-0.5 text-[11px] leading-4 text-muted-foreground hover:text-destructive">
                     Delete
                   </button>
                 )}
               </div>
+              </div>
             </div>
           );
         })}
+        {messages.length > 0 && (
+          <div className="mt-3 flex items-end gap-2">
+            <div className="h-8 w-8 shrink-0" />
+            <div className="flex h-9 items-center gap-1 rounded-[18px] rounded-bl-[4px] bg-[hsl(var(--imessage-received))] px-4">
+              <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--imessage-gray))] imessage-typing-dot" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--imessage-gray))] imessage-typing-dot [animation-delay:150ms]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--imessage-gray))] imessage-typing-dot [animation-delay:300ms]" />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input — bottom-aligned, follows keyboard */}
       <div
-        className="fixed left-0 right-0 z-20 border-t border-border/50 bg-background/95 px-2.5 py-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] backdrop-blur-xl"
+        className="fixed left-0 right-0 z-20 border-t border-[hsl(var(--imessage-border))] bg-[hsl(var(--imessage-background)/0.96)] px-3 py-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] backdrop-blur-xl"
         style={{ bottom: composerBottom }}
       >
         {selectedImage && (
