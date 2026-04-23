@@ -264,24 +264,33 @@ const LiveChatPage = () => {
             </button>
           </div>
         )}
-        <div className="flex items-center gap-1 rounded-full bg-secondary px-1 py-1 shadow-[var(--shadow-card)]">
-          <Button variant="ghost" size="icon" onClick={handleImageUpload} className="h-9 w-9 shrink-0 rounded-full">
-            <Paperclip className="h-4.5 w-4.5" />
+        <div className="flex items-end gap-2">
+          <Button variant="ghost" size="icon" onClick={handleImageUpload} className="h-[30px] w-[30px] shrink-0 rounded-full bg-[hsl(var(--imessage-control))] text-[hsl(var(--imessage-gray))] hover:bg-[hsl(var(--imessage-control))]">
+            <Camera className="h-5 w-5" />
           </Button>
-          <Input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-            placeholder="iMessage"
-            className="h-9 flex-1 rounded-full border border-border/60 bg-background px-3.5 text-[16px] leading-none shadow-none placeholder:text-muted-foreground"
-          />
+          <div className="flex min-h-9 flex-1 items-end rounded-[20px] border border-[hsl(var(--imessage-border))] bg-[hsl(var(--imessage-background))] px-[14px] py-1">
+            <Textarea
+              ref={textareaRef}
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              placeholder="iMessage"
+              rows={1}
+              className="max-h-[120px] min-h-7 resize-none overflow-hidden border-0 bg-transparent px-0 py-1 text-[16px] leading-5 shadow-none outline-none ring-0 placeholder:text-[hsl(var(--imessage-gray))] focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+          </div>
           {newMessage.trim() || selectedImage ? (
-            <Button onClick={handleSendMessage} size="icon" className="h-9 w-9 shrink-0 rounded-full">
-              <Send className="h-4 w-4" />
+            <Button onClick={handleSendMessage} size="icon" className="h-[30px] w-[30px] shrink-0 rounded-full bg-[hsl(var(--imessage-blue))] text-primary-foreground transition-all hover:bg-[hsl(var(--imessage-blue))]">
+              <ArrowUp className="h-5 w-5" />
             </Button>
           ) : (
-            <Button variant="ghost" size="icon" onClick={handleVoiceInput} className="h-9 w-9 shrink-0 rounded-full">
-              <Mic className="h-4.5 w-4.5" />
+            <Button variant="ghost" size="icon" onClick={handleVoiceInput} className="h-[30px] w-[30px] shrink-0 rounded-full text-[hsl(var(--imessage-gray))] transition-all hover:bg-transparent">
+              <Mic className="h-5 w-5" />
             </Button>
           )}
         </div>
