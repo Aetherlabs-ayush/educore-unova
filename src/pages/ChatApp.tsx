@@ -22,7 +22,9 @@ export type ChatRoom = {
 export type UserProfile = {
   id: string;
   user_id: string;
-  display_name: string;
+  display_name?: string;
+  name?: string;
+  phone?: string;
   avatar_url?: string;
   bio?: string;
   is_online: boolean;
@@ -37,6 +39,12 @@ const ChatApp = () => {
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const [userProfiles, setUserProfiles] = useState<UserProfile[]>([]);
   const navigate = useNavigate();
+
+  const getAuthPhone = (authUser: User) =>
+    authUser.phone || authUser.user_metadata?.phone || authUser.email || authUser.id;
+
+  const getAuthDisplayName = (authUser: User) =>
+    authUser.user_metadata?.display_name || authUser.email?.split('@')[0] || 'User';
 
   useEffect(() => {
     // Check authentication
@@ -53,7 +61,8 @@ const ChatApp = () => {
         .from('user_profiles')
         .upsert({
           user_id: session.user.id,
-          display_name: session.user.user_metadata?.display_name || session.user.email?.split('@')[0],
+          name: getAuthDisplayName(session.user),
+          phone: getAuthPhone(session.user),
           is_online: true,
           last_seen: new Date().toISOString()
         });
@@ -199,7 +208,7 @@ const ChatApp = () => {
       const targetProfile = userProfiles.find(p => p.user_id === targetUserId);
       const currentProfile = userProfiles.find(p => p.user_id === user.id);
       
-      const chatName = `${currentProfile?.display_name || 'You'} and ${targetProfile?.display_name || 'User'}`;
+      const chatName = `${currentProfile?.name || currentProfile?.display_name || 'You'} and ${targetProfile?.name || targetProfile?.display_name || 'User'}`;
 
       const { data: newRoom, error: roomError } = await supabase
         .from('chat_rooms')

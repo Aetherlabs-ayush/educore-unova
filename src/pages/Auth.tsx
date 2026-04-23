@@ -13,6 +13,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -39,6 +40,7 @@ const Auth = () => {
           emailRedirectTo: `${window.location.origin}/chat`,
           data: {
             display_name: displayName,
+            phone,
           }
         }
       });
@@ -51,7 +53,8 @@ const Auth = () => {
           .from('user_profiles')
           .insert({
             user_id: data.user.id,
-            display_name: displayName,
+            name: displayName,
+            phone,
             is_online: true
           });
 
@@ -93,7 +96,8 @@ const Auth = () => {
           .from('user_profiles')
           .upsert({
             user_id: data.user.id,
-            display_name: data.user.user_metadata?.display_name || email.split('@')[0],
+            name: data.user.user_metadata?.display_name || email.split('@')[0],
+            phone: data.user.phone || data.user.user_metadata?.phone || email,
             is_online: true,
             last_seen: new Date().toISOString()
           });
@@ -205,6 +209,17 @@ const Auth = () => {
                         required
                       />
                     </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-phone">Phone</Label>
+                    <Input
+                      id="signup-phone"
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>

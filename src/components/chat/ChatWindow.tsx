@@ -57,6 +57,9 @@ const ChatWindow = ({ chatRoom, currentUser, userProfiles }: ChatWindowProps) =>
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const currentUserProfile = userProfiles.find((profile) => profile.user_id === currentUser.id);
+  const currentUserPhone = currentUserProfile?.phone || currentUser.phone || currentUser.user_metadata?.phone || currentUser.email || currentUser.id;
+
   useEffect(() => {
     if (chatRoom) {
       fetchMessages();
@@ -130,7 +133,7 @@ const ChatWindow = ({ chatRoom, currentUser, userProfiles }: ChatWindowProps) =>
         .from('messages')
         .insert({
           text: newMessage.trim(),
-          sender_phone: currentUser.phone || currentUser.email || 'unknown'
+          sender_phone: currentUserPhone
         });
 
       if (error) throw error;
@@ -174,7 +177,7 @@ const ChatWindow = ({ chatRoom, currentUser, userProfiles }: ChatWindowProps) =>
         .from('messages')
         .insert({
           text: `File: ${file.name}`,
-          sender_phone: currentUser.phone || currentUser.email || 'unknown'
+          sender_phone: currentUserPhone
         });
 
       if (error) throw error;
@@ -203,7 +206,7 @@ const ChatWindow = ({ chatRoom, currentUser, userProfiles }: ChatWindowProps) =>
   };
 
   const getSenderProfile = (senderId: string) => {
-    return userProfiles.find(p => p.user_id === senderId);
+    return userProfiles.find(p => p.phone === senderId || p.user_id === senderId);
   };
 
   const getChatPartner = () => {

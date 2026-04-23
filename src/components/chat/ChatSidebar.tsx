@@ -126,7 +126,7 @@ const ChatSidebar = ({
                                 <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
                               ) : (
                                 <AvatarFallback className="bg-blue-100 text-blue-800">
-                                  {getInitials(profile.display_name)}
+                                  {getInitials(profile.name || profile.display_name || 'User')}
                                 </AvatarFallback>
                               )}
                             </Avatar>
@@ -136,7 +136,7 @@ const ChatSidebar = ({
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-gray-900 truncate">
-                              {profile.display_name}
+                              {profile.name || profile.display_name || 'User'}
                             </p>
                             <p className="text-sm text-gray-500">
                               {profile.is_online ? "Online" : formatLastSeen(profile.last_seen)}
@@ -233,7 +233,7 @@ const ChatSidebar = ({
                 <AvatarImage src={currentUserProfile.avatar_url} alt={currentUserProfile.display_name} />
               ) : (
                 <AvatarFallback className="bg-blue-100 text-blue-800">
-                  {getInitials(currentUserProfile?.display_name || currentUser.email?.split('@')[0] || 'U')}
+                  {getInitials(currentUserProfile?.name || currentUserProfile?.display_name || currentUser.email?.split('@')[0] || 'U')}
                 </AvatarFallback>
               )}
             </Avatar>
@@ -241,7 +241,7 @@ const ChatSidebar = ({
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-gray-900 truncate">
-              {currentUserProfile?.display_name || currentUser.email?.split('@')[0]}
+              {currentUserProfile?.name || currentUserProfile?.display_name || currentUser.email?.split('@')[0]}
             </p>
             <p className="text-sm text-green-600">Online</p>
           </div>
