@@ -31,6 +31,7 @@ import MediaUpload from "./pages/MediaUpload";
 import TeacherProfileCreate from "./pages/TeacherProfileCreate";
 import ViewAllTeachers from "./pages/ViewAllTeachers";
 import TeacherExamScores from "./pages/TeacherExamScores";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
         <div className="pb-16 min-h-screen relative">
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/downloads" element={<Downloads />} />
             <Route path="/notifications" element={<Notifications />} />
