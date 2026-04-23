@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Downloads from "./pages/Downloads";
@@ -69,7 +69,7 @@ const App = () => (
             <Route path="/teacher-profile-create" element={<TeacherProfileCreate />} />
             <Route path="/view-all-teachers" element={<ViewAllTeachers />} />
             <Route path="/teacher-exam-scores" element={<TeacherExamScores />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <BottomNav />
         </div>
