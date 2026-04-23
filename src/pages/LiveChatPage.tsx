@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
-import { Send, Mic, Paperclip, ArrowLeft, X } from "lucide-react";
+import { ArrowUp, Camera, Mic, ArrowLeft, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 type Message = {
@@ -24,7 +24,13 @@ const LiveChatPage = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [composerBottom, setComposerBottom] = useState(0);
+  const [activeReactionFor, setActiveReactionFor] = useState<string | null>(null);
+  const [reactions, setReactions] = useState<Record<string, string>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const longPressTimer = useRef<number | null>(null);
+
+  const reactionOptions = ["❤️", "👍", "👎", "😂", "!!", "?"];
 
   useEffect(() => {
     const profiles = JSON.parse(localStorage.getItem("student-profiles") || "[]");
@@ -47,6 +53,13 @@ const LiveChatPage = () => {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    textarea.style.height = "0px";
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+  }, [newMessage]);
 
   useEffect(() => {
     const viewport = window.visualViewport;
@@ -127,6 +140,20 @@ const LiveChatPage = () => {
 
   const handleDeleteMessage = async (id: string) => {
     await supabase.from("chat_messages").delete().eq("id", id);
+  };
+
+  const handleLongPressStart = (id: string) => {
+    if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
+    longPressTimer.current = window.setTimeout(() => setActiveReactionFor(id), 450);
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer.current) window.clearTimeout(longPressTimer.current);
+  };
+
+  const formatGroupTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" });
   };
 
   return (
